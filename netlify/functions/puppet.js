@@ -14,9 +14,10 @@ async function handler(_event, _context) {
       defaultViewport: chromium.defaultViewport,
       executablePath:
         process.env.CHROME_EXECUTABLE_PATH ||
-        (await chromium.executablePath(
-          "/var/task/node_modules/@sparticuz/chromium/bin"
-        )),
+        (await await chromium.executablePath()),
+      // (await chromium.executablePath(
+      //   "/var/task/node_modules/@sparticuz/chromium/bin"
+      // )),
       timeout: 30000,
     });
 
