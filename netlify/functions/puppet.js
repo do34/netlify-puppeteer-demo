@@ -138,10 +138,10 @@ async function handler(_event, _context) {
     };
   */
   } catch (error) {
-    console.error(error);
+    console.error(error.stack || error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error }),
+      body: JSON.stringify({ error: error.message, stack: error.stack }),
     };
   }
 }
