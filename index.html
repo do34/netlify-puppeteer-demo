@@ -1,61 +1,133 @@
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Netlify Puppeteer Test</title>
-    <meta name="description" content="We had a real hassle getting puppeteer working on Netlify, but we did, and here is a demo project for our reference." />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <style>
-      * {
-        color: #fff;
-        font-family: sans-serif;
-        font-weight: normal;
+  <title>Screen time calculator</title>
+  <meta name="description"
+    content="We had a real hassle getting puppeteer working on Netlify, but we did, and here is a demo project for our reference." />
+
+  <style>
+    * {
+      color: #fff;
+      font-family: sans-serif;
+      font-weight: normal;
+    }
+
+    body {
+      background-color: #1e1e1e;
+      font-size: 1rem;
+      inline-size: min(90vw, 50rem);
+      line-height: 1.5;
+      margin-inline: auto;
+      padding-block: 3rem;
+    }
+
+    .news a {
+      display: block;
+      margin-block-start: 1rem;
+      font-size: 1.3rem;
+      text-decoration-style: dotted;
+      text-decoration-thickness: 3px;
+      text-underline-offset: 0.2em;
+      text-decoration-color: rgb(255 255 255 / 0.3);
+    }
+
+    .gradeDetails {
+      display: flex;
+    }
+
+    .subject {
+      width: 120px;
+    }
+
+    .teacher {
+      width: 120px;
+    }
+
+    .grade {
+      width: 40px;
+    }
+
+    .screentime {
+      margin-top: 20px;
+      display: none;
+    }
+
+  </style>
+</head>
+
+<body>
+  <h2>Screen time calculator</h2>
+
+  <div class="news">Loading grades… B</div>
+
+  <div class="screenTime">screen time:</div>
+
+  <script>
+    const newsEl=document.querySelector('.news')
+    const screenTimeEl=document.querySelector('.screenTime')
+
+    const getPuppeteerData=async () => {
+      const puppetData=await fetch('/.netlify/functions/puppet')
+      const news=await puppetData.json()
+      return news
+    }
+
+    const hours=(mins) => {
+      const h=Math.floor(mins/60)
+      return `${h} hour${h===1? '':'s'}`
+    }
+
+    const minutes=(mins) => {
+      const m=mins%60
+      return `${m} minute${m===1? '':'s'}`
+    }
+
+    const screenTimeHuman=(mins) => {
+      if(mins>60)
+        return `${hours(mins)} and ${minutes(mins)}`
+      else
+        return mins
+    }
+
+    function gradeColor(grade) {
+      switch(grade) {
+        case 'A+':
+        case 'A':
+        case 'A-':
+          return '#4cba51'
+        case 'B+':
+        case 'B':
+        case 'B-':
+          return '#95ba48'
+        case 'C+':
+        case 'C':
+        case 'C-':
+          return '#e8a636 '
+        default: return '#c63627'
       }
-      body {
-        background-color: #1e1e1e;
-        font-size: 1rem;
-        inline-size: min(90vw, 50rem);
-        line-height: 1.5;
-        margin-inline: auto;
-        padding-block: 3rem;
-      }
-      .news a {
-        display: block;
-        margin-block-start: 1rem;
-        font-size: 1.3rem;
-        text-decoration-style: dotted;
-        text-decoration-thickness: 3px;
-        text-underline-offset: 0.2em;
-        text-decoration-color: rgb(255 255 255 / 0.3);
-      }
-    </style>
-  </head>
-  <body>
-    <h2>Netlify Puppeteer Test</h2>
+    }
+    ; (async () => {
+      const news=await getPuppeteerData();
+      console.log(`news: ${JSON.stringify(news)}`)
+      let screenTime=0;
+      const items=Object.keys(news).map(subject => {
+        const gradeDetails=news[ subject ];
+        screenTime+=gradeDetails.screenTime;
+        return `<div class="gradeDetails"><div class="subject">${subject}</div><div class="teacher">${gradeDetails.teacher}</div><div class="grade" style="color: ${gradeColor(gradeDetails.grade)}">${gradeDetails.grade}</div></div>`
+      }).join('')
+      // const items=news
+      //   .map((item) => {
+      //     return `<div><h2>${item.teacher}, ${item.grade}</h2>`
+      //   })
+      //   .join('')
+      newsEl.innerHTML=items
+      screenTimeEl.innerHTML=`screen time: ${screenTimeHuman(screenTime)}`
+      screenTimeEl.style.display='block'
+    })()
+  </script>
+</body>
 
-    <p>News headlines from <a href="https://lite.cnn.com/">cnn lite</a></p>
-
-    <div class="news">Loading news…</div>
-
-    <script>
-      const newsEl = document.querySelector('.news')
-
-      const getPuppeteerData = async () => {
-        const puppetData = await fetch('/.netlify/functions/puppet')
-        const news = await puppetData.json()
-        return news
-      }
-
-      ;(async () => {
-        const news = await getPuppeteerData()
-        const items = news
-          .map((item) => {
-            return `<div><h2><a href="${item.url}">${item.title}</a></h2>`
-          })
-          .join('')
-        newsEl.innerHTML = items
-      })()
-    </script>
-  </body>
 </html>
