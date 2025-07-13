@@ -43,7 +43,7 @@ async function handler(event, context) {
     console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error }),
+      body: JSON.stringify({ the_error: error }),
     };
   }
 }
