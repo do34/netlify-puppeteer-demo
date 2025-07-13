@@ -7,7 +7,7 @@ const url = "https://portal.wcsd.k12.ca.us/parent/LoginParent.aspx";
 chromium.setHeadlessMode = true;
 chromium.setGraphicsMode = false;
 
-export async function handler(_event, _context) {
+async function handler(_event, _context) {
   try {
     const browser = await puppeteer.launch({
       args: chromium.args,
